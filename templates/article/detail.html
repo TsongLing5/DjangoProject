@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>
+        {% extends "base.html" %}
+        {% load staticfiles %}
+
+        {% block title %}
+        文章详情
+        {% endblock title %}
+
+        {% block content %}
+            <div class="container">
+                <div class="row">
+                    <!-- 标题及作者 -->
+                    <h1 class="col-12 mt-4 mb-4">{{ article.title }}</h1>
+                    <div class="col-12 alert alert-success">作者：{{ article.author }}</div>
+                    <!-- 文章正文 -->
+                    <div class="col-12">
+                        <p>{{ article.body }}</p>
+                    </div>
+                </div>
+            </div>
+
+
+        {% endblock content %}
+    </title>
+</head>
+<body>
+
+</body>
+</html>
