@@ -5,7 +5,9 @@ from django.db import models
 # 导入内建的User模型。
 from django.contrib.auth.models import User
 # timezone 用于处理时间相关事务。
+from django.template.backends import django
 from django.utils import timezone
+# django.utils.timezone.now
 
 # 博客文章数据模型
 class ArticlePost(models.Model):

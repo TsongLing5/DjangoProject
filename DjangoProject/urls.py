@@ -34,8 +34,10 @@ urlpatterns = [
     path('test/<str:a>/',blog.views.test,name='test'),
     path('test/<int:a>/',blog.views.test,name='test'),
     path('haha/',blog.views.home,name='home'),
-    path('article/articleList',blog.views.articleList,name='articleList'),
-    path('article/article-detail/<int:id>/',blog.views.article_detail,name='article_detail')
+    path('article/articleList/',blog.views.articleList,name='articleList'),
+    path('article/article-detail/<int:id>/',blog.views.article_detail,name='article_detail'),
+
+    path('article-create/',blog.views.article_create,name='article_create'),
 
 
 
