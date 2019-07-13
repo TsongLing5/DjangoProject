@@ -17,7 +17,7 @@
                     <h1 class="col-12 mt-4 mb-4">{{ article.title }}</h1>
                     <div class="col-12 alert alert-success">
                         <a  >作者：{{ article.author }}</a>
-                        <a href="#" color="red">   删除文章   </a>
+                        <a href="#" onclick="confirm_delete()">   删除文章   </a>
                     </div>
                     <!-- 文章正文 -->
 
@@ -28,7 +28,34 @@
                     </div>
                 </div>
             </div>
+            <script>
+                <!-- 弹窗逻辑 -->
+                function confirm_delete(){
+layer.confirm('确定要删除吗？', {
+  btn: ['不了','删除'] //按钮
+}, function(){
+  layer.msg('取消删除', {icon: 2});
+}, function(){
+    location.href="/article/article-delete/{{ article.id }}"
+    layer.msg('删除成功', {icon: 1});
 
+});
+
+
+            {#    layer.open({#}
+            {##}
+            {#title: "删除确认",#}
+            {##}
+            {#content: "真的要删了这篇文章吗？",#}
+            {##}
+            {#yes: function(index, layero) {#}
+            {##}
+            {#            location.href="/article/article-delete/{{ article.id }}"#}
+            {#        },#}
+            {#    })#}
+             }
+
+            </script>
 
         {% endblock content %}
     </title>

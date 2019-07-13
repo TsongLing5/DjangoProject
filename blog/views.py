@@ -77,3 +77,8 @@ def article_create(request):
         article_post_form=ArticlePostForm()
         context={'article_post_form': article_post_form}
         return render(request,'article/createpage.html',context)
+
+def article_delete(request,id):
+    article=ArticlePost.objects.get(id=id)
+    article.delete()
+    return redirect('/')  #delete 完成 return home
