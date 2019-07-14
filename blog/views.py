@@ -82,3 +82,28 @@ def article_delete(request,id):
     article=ArticlePost.objects.get(id=id)
     article.delete()
     return redirect('/')  #delete 完成 return home
+
+
+def article_update(request,id):
+    article=ArticlePost.objects.get(id=id)
+    if request.method == "POST":
+        article_post_form = ArticlePostForm(data=request.POST)
+        if article_post_form.is_valid():
+            article.title=request.POST['title']
+            article.body = request.POST['body']
+            # print(request.POST['title'])
+            # print(article.body)
+            article.save()
+            return redirect("/article/article-detail/"+str(id))
+        else:
+            return HttpResponse("表???")
+    else:  #metho GET
+        article_get_form = ArticlePostForm()
+        article_get_form.body=article.body
+        context = {'article':article,'article_get_form': article_get_form}
+        return render(request, 'article/createpage.html', context)
+
+
+
+def userLogin(request):
+    return render(request,'login.html')

@@ -17,7 +17,11 @@
                     <h1 class="col-12 mt-4 mb-4">{{ article.title }}</h1>
                     <div class="col-12 alert alert-success">
                         <a  >作者：{{ article.author }}</a>
+                        <!-- 加入判断登陆逻辑 -->
+                        {% if 11 > 1 %}
                         <a href="#" onclick="confirm_delete()">   删除文章   </a>
+                        <a href="/article/article-update/{{ article.id }}" >  修改   </a>
+                        {% endif %}
                     </div>
                     <!-- 文章正文 -->
 
