@@ -17,9 +17,10 @@ import os
 
 from django.conf.urls import url
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 
 import blog
+import userprofile
 from DjangoProject.settings import BASE_DIR
 from blog.views import index, main,test
 
@@ -40,7 +41,8 @@ urlpatterns = [
     path('article-create/',blog.views.article_create,name='article_create'),
     path('article/article-delete/<int:id>/',blog.views.article_delete,name='article_delete'),
     path('article/article-update/<int:id>/',blog.views.article_update,name='article_update'),
-    path('login/',blog.views.userLogin,name='userLogin'),
+    path('userprofile/', include('userprofile.urls', namespace='userprofile')),
+    # path('login/',userprofile.views.user_login,name='userLogin'),
 
 
 
