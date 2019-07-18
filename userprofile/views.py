@@ -1,7 +1,8 @@
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
-from userprofile.forms import UserLoginForm
+from userprofile.forms import UserLoginForm, UserRegisterForm
+
 
 # Create your views here.
 
@@ -33,3 +34,19 @@ def user_login(request):
 def user_logout(request):
     logout(request)
     return redirect('/')
+
+def user_register(request):
+    if request.method == "POST":
+        userRegisterForm=UserRegisterForm(data=request.POST)
+        if userRegisterForm.is_valid():
+            newUser=userRegisterForm.save(commit=False)
+            newUser.set_password(userRegisterForm.cleaned_data['password'])
+            newUser.save()
+            login(request,newUser)
+            return redirect('/')
+        else:
+            return HttpResponse("输入的数据无效！请重新输入")
+    elif request.method == "GET":  #Get
+        form=UserLoginForm()
+        context={"form":form}
+        return render(request, 'register.html',context)
