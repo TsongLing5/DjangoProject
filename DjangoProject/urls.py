@@ -42,6 +42,7 @@ urlpatterns = [
     path('article/article-delete/<int:id>/',blog.views.article_delete,name='article_delete'),
     path('article/article-update/<int:id>/',blog.views.article_update,name='article_update'),
     path('userprofile/', include('userprofile.urls', namespace='userprofile')),
+
     # path('login/',userprofile.views.user_login,name='userLogin'),
 
 

@@ -1,4 +1,6 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from userprofile.forms import UserLoginForm, UserRegisterForm
@@ -38,6 +40,10 @@ def user_logout(request):
 def user_register(request):
     if request.method == "POST":
         userRegisterForm=UserRegisterForm(data=request.POST)
+        if request.POST.get('password') == request.POST.get('password2'):
+            pass
+        else:
+            return HttpResponse("密码不一致，请重新输入密码")
         if userRegisterForm.is_valid():
             newUser=userRegisterForm.save(commit=False)
             newUser.set_password(userRegisterForm.cleaned_data['password'])
@@ -45,8 +51,19 @@ def user_register(request):
             login(request,newUser)
             return redirect('/')
         else:
-            return HttpResponse("输入的数据无效！请重新输入")
+            # userRegisterForm.cleaned_data['password']
+            return HttpResponse("输入的数据无效！请重新输入!")
     elif request.method == "GET":  #Get
         form=UserLoginForm()
         context={"form":form}
         return render(request, 'register.html',context)
+
+@login_required(login_url='/userprofile/login')
+def user_delete(request,id):
+    user=User.objects.get(id=id)
+    if(user== request.user):
+        logout(request)
+        user.delete()
+        return redirect('/')
+    else:
+        return HttpResponse("Auth deny!")
