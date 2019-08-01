@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.core.paginator import Paginator
 from django.shortcuts import render, redirect
 
 # Create your views here.
@@ -32,13 +33,17 @@ def home(request):
     return render(request, 'article/articleList.html', context)
 
 def articleList(request):
-    articles=ArticlePost.objects.all()
+    articleList=ArticlePost.objects.all()
+    pagionator=Paginator(articleList,1)
+    page=request.GET.get('page')
+    articles=pagionator.get_page(page)
     context = {'articles': articles}
     return  render(request,'article/articleList.html',context)
 
 def article_detail(request, id):
     article = ArticlePost.objects.get(id=id)
-
+    article.total_views +=1
+    article.save(update_fields=['total_views'])
     article.body = markdown.markdown(article.body,
                                      extensions=[
                                          # 包含 缩写、表格等常用扩展
@@ -65,7 +70,7 @@ def article_create(request):
             # 指定数据库中 id=1 的用户为作者
             # 如果你进行过删除数据表的操作，可能会找不到id=1的用户
             # 此时请重新创建用户，并传入此用户的id
-            new_article.author = User.objects.get(id=1)
+            new_article.author = User.objects.get(id=request.user.id)
             # 将新文章保存到数据库中
             new_article.save()
 
@@ -80,28 +85,33 @@ def article_create(request):
 
 def article_delete(request,id):
     article=ArticlePost.objects.get(id=id)
-    article.delete()
-    return redirect('/')  #delete 完成 return home
-
+    if request.user == article.author:
+        article.delete()
+        return redirect('/')  #delete 完成 return home
+    else:
+        return HttpResponse('错误，无权修改')
 
 def article_update(request,id):
     article=ArticlePost.objects.get(id=id)
-    if request.method == "POST":
-        article_post_form = ArticlePostForm(data=request.POST)
-        if article_post_form.is_valid():
-            article.title=request.POST['title']
-            article.body = request.POST['body']
-            # print(request.POST['title'])
-            # print(article.body)
-            article.save()
-            return redirect("/article/article-detail/"+str(id))
-        else:
-            return HttpResponse("表???")
-    else:  #metho GET
-        article_get_form = ArticlePostForm()
-        article_get_form.body=article.body
-        context = {'article':article,'article_get_form': article_get_form}
-        return render(request, 'article/createpage.html', context)
+    if request.user == article.author:
+        if request.method == "POST":
+            article_post_form = ArticlePostForm(data=request.POST)
+            if article_post_form.is_valid():
+                article.title=request.POST['title']
+                article.body = request.POST['body']
+                # print(request.POST['title'])
+                # print(article.body)
+                article.save()
+                return redirect("/article/article-detail/"+str(id))
+            else:
+                return HttpResponse("表???")
+        else:  #metho GET
+            article_get_form = ArticlePostForm()
+            article_get_form.body=article.body
+            context = {'article':article,'article_get_form': article_get_form}
+            return render(request, 'article/createpage.html', context)
+    else:
+        return HttpResponse("无权修改")
 
 
 

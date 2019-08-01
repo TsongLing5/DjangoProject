@@ -17,8 +17,8 @@
                     <h1 class="col-12 mt-4 mb-4">{{ article.title }}</h1>
                     <div class="col-12 alert alert-success">
                         <a  >作者：{{ article.author }}</a>
-                        <!-- 加入判断登陆逻辑 -->
-                        {% if user.is_authenticated %}
+                        <!-- 加入本人登陆逻辑 -->
+                        {% if user == article.author %}
                         <a href="#" onclick="confirm_delete()">   删除文章   </a>
                         <a href="/article/article-update/{{ article.id }}" >  修改文章   </a>
                         {% else %}
@@ -27,6 +27,11 @@
 
                         {% endif %}
                     </div>
+                <span>
+                    <small class="col align-self-end" style="color: gray;">
+                        浏览: {{ article.total_views }}
+                    </small>
+                </span>
                     <!-- 文章正文 -->
 
                     <div class="col-12">

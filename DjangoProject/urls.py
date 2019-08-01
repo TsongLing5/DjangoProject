@@ -15,7 +15,9 @@ Including another URLconf
 """
 import os
 
+from django.conf import settings
 from django.conf.urls import url
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 
@@ -42,9 +44,12 @@ urlpatterns = [
     path('article/article-delete/<int:id>/',blog.views.article_delete,name='article_delete'),
     path('article/article-update/<int:id>/',blog.views.article_update,name='article_update'),
     path('userprofile/', include('userprofile.urls', namespace='userprofile')),
+    path('password-reset/', include('password_reset.urls')),
 
     # path('login/',userprofile.views.user_login,name='userLogin'),
 
 
 
 ]
+
+# urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
