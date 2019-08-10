@@ -9,7 +9,9 @@ from django.dispatch import receiver
 class Profile(models.Model):
     user=models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     phone=models.CharField(max_length=11,blank=True)
-    avatar=models.ImageField(upload_to='avatar/%Y%m%d/',blank=True)  #此处'avatar/%Y%m%d/'不详
+
+    avatar=models.ImageField(upload_to='avatar/%Y%m%d/',blank=True)  #此处'avatar/%Y%m%d/'头像路径
+
     bio=models.CharField(max_length=500,blank=True)
 
     def __str__(self):

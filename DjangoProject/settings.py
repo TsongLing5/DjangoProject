@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'blog',
     'userprofile',
+    'comment',
 ]
 
 MIDDLEWARE = [
@@ -111,9 +112,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 
-LANGUAGE_CODE = 'zh-hans'   #'en-us'英文改为'zh-hans' 汉字
+LANGUAGE_CODE = 'zh-hans'   #'en- us'英文改为'zh-hans' 汉字
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Shanghai'  #UTC
 
 USE_I18N = True
 
@@ -141,3 +142,6 @@ EMAIL_PORT = 25
 EMAIL_USE_TLS = True
 # 默认的发件人
 DEFAULT_FROM_EMAIL = 'xxx的博客 <xxx@126.com>'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')

@@ -6,6 +6,7 @@ from django.db import models
 from django.contrib.auth.models import User
 # timezone 用于处理时间相关事务。
 from django.template.backends import django
+from django.urls import reverse
 from django.utils import timezone
 # django.utils.timezone.now
 
@@ -38,3 +39,6 @@ class ArticlePost(models.Model):
     def __str__(self):
         # return self.title 将文章标题返回
         return self.title
+
+    def get_absolute_url(self):
+        return reverse("article_detail", args=[self.id])

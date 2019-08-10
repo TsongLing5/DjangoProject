@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
+from django.db.models import Q
 from django.shortcuts import render, redirect
 
 # Create your views here.
@@ -9,6 +10,8 @@ from django.http import HttpResponse
 from blog.models import ArticlePost
 from blog.forms import ArticlePostForm
 import markdown
+
+from comment.models import Comment
 
 userlist=[]
 def index(request):
@@ -33,26 +36,54 @@ def home(request):
     return render(request, 'article/articleList.html', context)
 
 def articleList(request):
-    articleList=ArticlePost.objects.all()
-    pagionator=Paginator(articleList,1)
+    search=request.GET.get('search')
+    if search:
+        if request.GET.get('order') == 'total_views':
+            articleList = ArticlePost.objects.filter(Q(title__icontains=search) | Q(body__icontains=search)).order_by('-total_views')
+            order='total_views'
+        else:
+            articleList=ArticlePost.objects.filter(Q(title__icontains=search)|Q(body__icontains=search))
+            order='normal'
+    else:
+        # search=''
+        if request.GET.get('order') == 'total_views':
+            articleList = ArticlePost.objects.all().order_by('-total_views')
+            order='total_views'
+        else:
+            articleList=ArticlePost.objects.all()
+            order='normal'
+
+    pagionator=Paginator(articleList,3)
     page=request.GET.get('page')
     articles=pagionator.get_page(page)
-    context = {'articles': articles}
+    context = {'articles': articles,'order':order,'search':search}
     return  render(request,'article/articleList.html',context)
 
 def article_detail(request, id):
     article = ArticlePost.objects.get(id=id)
+    comments=Comment.objects.filter(article=id)
+
     article.total_views +=1
     article.save(update_fields=['total_views'])
-    article.body = markdown.markdown(article.body,
-                                     extensions=[
-                                         # 包含 缩写、表格等常用扩展
-                                         'markdown.extensions.extra',
-                                         # 语法高亮扩展
-                                         'markdown.extensions.codehilite',
-                                     ])
 
-    context = {'article':article}
+    md = markdown.Markdown(
+        extensions=[
+        'markdown.extensions.extra',
+        'markdown.extensions.codehilite',
+        'markdown.extensions.toc',
+        ]
+    )
+    # article.body = markdown.markdown(article.body,
+    #                                  extensions=[
+    #                                      # 包含 缩写、表格等常用扩展
+    #                                      'markdown.extensions.extra',
+    #                                      # 语法高亮扩展
+    #                                      'markdown.extensions.codehilite',
+    #                                      'markdown.extensions.TOC',
+    #                                  ])
+    article.body = md.convert(article.body)
+
+    context = {'article':article,'toc': md.toc,'comments':comments}
 
     # article = ArticlePost.objects.get(id=id)
     # # 需要传递给模板的对象

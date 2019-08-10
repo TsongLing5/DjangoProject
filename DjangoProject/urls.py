@@ -37,6 +37,7 @@ urlpatterns = [
     path('test/<str:a>/',blog.views.test,name='test'),
     path('test/<int:a>/',blog.views.test,name='test'),
     path('article/',blog.views.home,name='home'),
+    path('',blog.views.articleList,name='articleList'),
     path('article/articleList/',blog.views.articleList,name='articleList'),
     path('article/article-detail/<int:id>/',blog.views.article_detail,name='article_detail'),
 
@@ -46,10 +47,12 @@ urlpatterns = [
     path('userprofile/', include('userprofile.urls', namespace='userprofile')),
     path('password-reset/', include('password_reset.urls')),
 
+    path('comment/', include('comment.urls', namespace='comment')),
+
     # path('login/',userprofile.views.user_login,name='userLogin'),
 
 
 
 ]
-
-# urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# 用户头像相关
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

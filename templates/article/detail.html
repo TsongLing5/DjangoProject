@@ -14,45 +14,121 @@
             <div class="container">
                 <div class="row">
                     <!-- 标题及作者 -->
-                    <h1 class="col-12 mt-4 mb-4">{{ article.title }}</h1>
-                    <div class="col-12 alert alert-success">
-                        <a  >作者：{{ article.author }}</a>
-                        <!-- 加入本人登陆逻辑 -->
-                        {% if user == article.author %}
-                        <a href="#" onclick="confirm_delete()">   删除文章   </a>
-                        <a href="/article/article-update/{{ article.id }}" >  修改文章   </a>
-                        {% else %}
-{#                            <span class="operate" >删除文章</span>#}
-{#                            <span class="operate" >修改文章</span>#}
+                    <div class = "col-14">
+                        <h1 class="mt-4 mb-4">{{ article.title }}</h1>
+                        <div class="alert alert-success">
+                            <a  >作者：{{ article.author }}</a>
+                            <!-- 加入本人登陆逻辑 -->
+                            {% if user == article.author %}
+                            <a href="#" onclick="confirm_delete()">   删除文章   </a>
+                            <a href="/article/article-update/{{ article.id }}" >  修改文章   </a>
+                            {% else %}
+    {#                            <span class="operate" >删除文章</span>#}
+    {#                            <span class="operate" >修改文章</span>#}
 
-                        {% endif %}
+                            {% endif %}
+                        </div>
+
+                        <span>
+                            <small class="col align-self-end" style="color: gray;">
+                                浏览: {{ article.total_views }}
+                            </small>
+                        </span>
+
+                            <!-- 文章正文 -->
+                        <div class="row">
+                            <div class="col-9">
+                                <p>{{ article.body | safe }}</p>
+                            </div>
+
+                            <div class="col-3 ">
+                                    <h4><strong>目录</strong></h4>
+                                    <hr>
+                                    <div>
+                                        {{ toc|safe }}
+                                    </div>
+                            </div>
+
+                        </div>
+
+
                     </div>
-                <span>
-                    <small class="col align-self-end" style="color: gray;">
-                        浏览: {{ article.total_views }}
-                    </small>
-                </span>
-                    <!-- 文章正文 -->
-
-                    <div class="col-12">
 
 
-                        <p>{{ article.body | safe }}</p>
-                    </div>
+
+
                 </div>
-            </div>
+
+                {% if user.is_authenticated %}
+                    <div>
+                        <form
+                            action="{% url 'comment:post_comment' article.id %}"
+                            method="POST"
+                        >
+                        {% csrf_token %}
+                            <div class="form-group">
+                                <label for="body">
+                                    <strong>
+                                        我也要发言：
+                                    </strong>
+                                </label>
+                                <textarea
+                                    type="text"
+                                    class="form-control"
+                                    id="body"
+                                    name="body"
+                                    rows="2"></textarea>
+                            </div>
+                            <!-- 提交按钮 -->
+                            <button type="submit" class="btn btn-primary ">发送</button>
+                        </form>
+                    </div>
+                    <br>
+                {% else %}
+                    <br>
+                    <h5 class="row justify-content-center">
+                        请<a href="{% url 'userprofile:login' %}">登录</a>后回复
+                    </h5>
+                    <br>
+                {% endif %}
+
+
+
+
+            {% if comments.count %}
+                <h4>共有{{ comments.count }}条评论</h4>
+                <div>
+                    {% for comment in comments %}
+                        <hr>
+                        <p>
+                            <strong style="color: pink">
+                                {{ comment.user }}
+                            </strong> 于
+                            <span style="color: green">
+                                {{ comment.created|date:"Y-m-d H:i:s" }}
+                            </span> 时说：
+                        </p>
+                        <pre style="font-family: inherit; font-size: 1em;">
+                            {{ comment.body }}</pre>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <h4>暂无评论，快来评论吧！</h4>
+            {% endif %}
+
+
             <script>
                 <!-- 弹窗逻辑 -->
                 function confirm_delete(){
-layer.confirm('确定要删除吗？', {
-  btn: ['不了','删除'] //按钮
-}, function(){
-  layer.msg('取消删除', {icon: 2});
-}, function(){
-    location.href="/article/article-delete/{{ article.id }}"
-    layer.msg('删除成功', {icon: 1});
+                layer.confirm('确定要删除吗？', {
+                  btn: ['不了','删除'] //按钮
+                }, function(){
+                  layer.msg('取消删除', {icon: 2});
+                }, function(){
+                    location.href="/article/article-delete/{{ article.id }}"
+                    layer.msg('删除成功', {icon: 1});
 
-});
+                });
 
 
             {#    layer.open({#}
