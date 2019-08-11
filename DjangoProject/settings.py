@@ -15,7 +15,15 @@ import configparser
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CONF_DIR=os.path.join(BASE_DIR, 'configuration/cfg.ini')
 
+cfg_path = CONF_DIR
+cf = configparser.ConfigParser()
+cf.read(cfg_path)
+
+EMAIL_HOST_USER = cf.get("email_cfg", "email_host_user")
+EMAIL_HOST_PASSWORD = cf.get("email_cfg", "email_password")
+DEFAULT_FROM_EMAIL = cf.get("email_cfg", "default_from_mail")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
@@ -127,6 +135,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
+
+
+
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS=[os.path.join(BASE_DIR,'static')]
@@ -134,15 +145,15 @@ STATICFILES_DIRS=[os.path.join(BASE_DIR,'static')]
 # SMTP服务器，改为你的邮箱的smtp!
 EMAIL_HOST = 'smtp.126.com'
 # 改为你自己的邮箱名！
-EMAIL_HOST_USER = 'xxx@126.com'
+EMAIL_HOST_USER = cf.get("email_cfg", "email_host_user")
 # 你的邮箱密码
-EMAIL_HOST_PASSWORD = 'sn'
+EMAIL_HOST_PASSWORD = cf.get("email_cfg", "email_password")
 # 发送邮件的端口
 EMAIL_PORT = 25
 # 是否使用 TLS
 EMAIL_USE_TLS = True
 # 默认的发件人
-DEFAULT_FROM_EMAIL = 'xxx的博客 <xxx@126.com>'
+DEFAULT_FROM_EMAIL = cf.get("email_cfg", "default_from_mail")
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')

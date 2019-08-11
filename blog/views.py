@@ -7,12 +7,26 @@ from django.shortcuts import render, redirect
 from django.shortcuts import render
 from django.http import HttpResponse
 
+from DjangoProject import settings
 from blog.models import ArticlePost
 from blog.forms import ArticlePostForm
 import markdown
 
 from comment.models import Comment
 from userprofile.models import Profile
+import configparser
+
+# cfg_path = settings.CONF_DIR
+# cf = configparser.ConfigParser()
+# cf.read(cfg_path)
+#
+# settings.EMAIL_HOST_USER = cf.get("email_cfg", "email_host_user")  # 读取配置文件
+# settings.DEFAULT_FROM_EMAIL=cf.get("email_cfg", "default_from_mail")
+# settings.EMAIL_HOST_PASSWORD=cf.get("email_cfg", "email_password")
+# print(settings.EMAIL_HOST_USER)
+# print(settings.EMAIL_HOST_PASSWORD)
+# print(settings.DEFAULT_FROM_EMAIL)
+# print(mail_host)
 
 userlist=[]
 def index(request):

@@ -23,7 +23,9 @@
 
                      <div class="btn-group" bgcolor="#000000">
                         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" ><font color="#FFFFFF">{{ user.username }}</font>
+                            {% if profile.avatar %}
                             <img src="{{ profile.avatar.url }}" style="max-width: 30px; border-radius: 20%;" class="img-circle">
+                             {% endif %}
                             <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu" role="menu" >
