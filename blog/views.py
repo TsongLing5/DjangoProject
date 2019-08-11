@@ -12,6 +12,7 @@ from blog.forms import ArticlePostForm
 import markdown
 
 from comment.models import Comment
+from userprofile.models import Profile
 
 userlist=[]
 def index(request):
@@ -31,12 +32,15 @@ def test(request,a):
     return HttpResponse("AHAHA"+str(a))
 
 def home(request):
-    articles = ArticlePost.objects.all()
-    context = {'articles': articles}
-    return render(request, 'article/articleList.html', context)
+    return redirect("articleList") #将网页重新指向articleList 这个页面，跳转
+    # articles = ArticlePost.objects.all()
+    # context = {'articles': articles}
+    # return render(request, 'article/articleList.html', context)
 
 def articleList(request):
     search=request.GET.get('search')
+    if request.user.is_authenticated:
+        profile = Profile.objects.get(user=request.user)
     if search:
         if request.GET.get('order') == 'total_views':
             articleList = ArticlePost.objects.filter(Q(title__icontains=search) | Q(body__icontains=search)).order_by('-total_views')
@@ -53,15 +57,24 @@ def articleList(request):
             articleList=ArticlePost.objects.all()
             order='normal'
 
-    pagionator=Paginator(articleList,3)
+    pagionator=Paginator(articleList,6)
     page=request.GET.get('page')
     articles=pagionator.get_page(page)
-    context = {'articles': articles,'order':order,'search':search}
+    if request.user.is_authenticated:
+        context = {'articles': articles,'order':order,'search':search,'profile':profile}
+    else:
+        context = {'articles': articles, 'order': order, 'search': search}
     return  render(request,'article/articleList.html',context)
 
 def article_detail(request, id):
     article = ArticlePost.objects.get(id=id)
     comments=Comment.objects.filter(article=id)
+
+    # comments = Comment.objects.filter(article=id)
+
+    profile = Profile.objects.get(user=request.user)
+    # print(profile.avatar.url)
+    # print(request.user)
 
     article.total_views +=1
     article.save(update_fields=['total_views'])
@@ -83,7 +96,7 @@ def article_detail(request, id):
     #                                  ])
     article.body = md.convert(article.body)
 
-    context = {'article':article,'toc': md.toc,'comments':comments}
+    context = {'article':article,'toc': md.toc,'comments':comments,'profile':profile}
 
     # article = ArticlePost.objects.get(id=id)
     # # 需要传递给模板的对象

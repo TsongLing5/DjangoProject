@@ -22,7 +22,7 @@ def user_login(request):
             if user:
                 # 将用户数据保存在 session 中，即实现了登录动作
                 login(request, user)
-                return redirect("/")
+                return redirect("articleList")
             else:
                 return HttpResponse("账号或密码输入有误。请重新输入~")
         else:

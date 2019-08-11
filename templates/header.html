@@ -9,7 +9,7 @@
     <div>
       <ul class="navbar-nav">
         <!-- 条目 -->
-        {% if user.is_authenticated %}
+        {% if request.user.is_authenticated %}
         <li class="nav-item">
           <a class="nav-link" href="/article-create">Compose</a>
 
@@ -19,16 +19,26 @@
         {% endif %}
 
              <li class="nav-item">
-                 {% if user.is_authenticated %}
+                 {% if request.user.is_authenticated %}
 
-                     <a class="dropdown-item" href="#" onclick="user_delete()">删除用户</a>
-                     <a class="nav-link" href="/userprofile/logout">注销</a>
-                     <a class="nav-link" href="/userprofile/edit/{{ user.id }}">编辑</a>
-                     <a class="nav-link" href="#">{{ user.username }}</a>
+                     <div class="btn-group" bgcolor="#000000">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" ><font color="#FFFFFF">{{ user.username }}</font>
+                            <img src="{{ profile.avatar.url }}" style="max-width: 30px; border-radius: 20%;" class="img-circle">
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu" >
+                            <li><a href="#" onclick="user_delete()">删除账号</a></li>
+                            <li><a href="/userprofile/logout">退出登录</a></li>
+                            <li><a href="/userprofile/edit/{{ user.id }}">修改资料</a></li>
+                            <li class="divider"></li>
+
+
+                        </ul>
+                    </div>
 
                  {% else %}
 
-                     <a class="nav-link" href="/userprofile/login">登陆</a>
+                     <a class="nav-link" href="/userprofile/login">登陆/注册</a>
                  {% endif %}
 
             </li>
