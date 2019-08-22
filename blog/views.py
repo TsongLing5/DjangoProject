@@ -10,6 +10,7 @@ from django.http import HttpResponse
 from DjangoProject import settings
 from blog.models import ArticlePost
 from blog.forms import ArticlePostForm
+from blog.models import ArticleColumn
 import markdown
 
 from comment.models import Comment
@@ -130,7 +131,14 @@ def article_create(request):
             # 此时请重新创建用户，并传入此用户的id
             new_article.author = User.objects.get(id=request.user.id)
             # 将新文章保存到数据库中
+            if request.POST['column'] != None:
+                new_article.column=ArticleColumn.objects.get(id=request.POST['column'])
+
+            else:
+                new_article.column=None
+
             new_article.save()
+            article_post_form.save_m2m()
 
             return redirect('/') #重新定向回主页
         # 如果数据不合法，返回错误信息
@@ -138,7 +146,8 @@ def article_create(request):
             return HttpResponse("表单内容有误，请重新填写。")#此处建议用错误弹窗提高体验也使得表单数据不易丢失
     else:
         article_post_form=ArticlePostForm()
-        context={'article_post_form': article_post_form}
+        columns=ArticleColumn.objects.all()
+        context={'article_post_form': article_post_form,'columns':columns}
         return render(request,'article/createpage.html',context)
 
 def article_delete(request,id):
@@ -157,16 +166,33 @@ def article_update(request,id):
             if article_post_form.is_valid():
                 article.title=request.POST['title']
                 article.body = request.POST['body']
+                tags=request.POST['tags']
+                if(tags):
+                    print(tags)
+                    print(article.tags.all)
+                    article.tags.clear()
+                    for tag in tags.split(","):
+                        article.tags.add(tag)
+                        print(tag)
+
+                # article.tags.set(request.POST['tags'],clear=True)
                 # print(request.POST['title'])
                 # print(article.body)
+                if(request.POST['column'] != 'none'):
+                    article.column=ArticleColumn.objects.get(id=request.POST['column'])
+                else:
+                    article.column=None
                 article.save()
+
                 return redirect("/article/article-detail/"+str(id))
             else:
                 return HttpResponse("表???")
         else:  #metho GET
             article_get_form = ArticlePostForm()
+            columns = ArticleColumn.objects.all()
+
             article_get_form.body=article.body
-            context = {'article':article,'article_get_form': article_get_form}
+            context = {'article':article,'article_get_form': article_get_form,'columns':columns}
             return render(request, 'article/createpage.html', context)
     else:
         return HttpResponse("无权修改")
@@ -174,4 +200,4 @@ def article_update(request,id):
 
 
 def userLogin(request):
-    return render(request, 'article/llogin.html')
+    return render(request, 'article/login.html')

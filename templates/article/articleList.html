@@ -50,21 +50,76 @@
 
         {% for article in articles %}
         <!-- 文章内容 -->
-        <div class="col-4 mb-4">
+        <div class="col-11 mb-n1">
         <!-- 卡片容器 -->
-            <div class="card h-100">
+            <div class="card h-100" >
                 <!-- 标题 -->
-                <h4 class="card-header">{{ article.title }}</h4>
+                <h3>
+                    <b>
+                        <a href="/article/article-detail/{{ article.id }}" style="color:black">{{ article.title }}</a>
+                    </b>
+                </h3>
                 <!-- 摘要 -->
-                <div class="card-body">
-                    <p class="card-text">{{ article.body|slice:'100' }}...</p>
-                </div>
+{#                <div class="card-body">#}
+                <h5>
+                    <p class="card-text" style="color:gray">{{ article.body|slice:'30' }}...</p>
+{#                </div>#}
+                </h5>
+
                 <!-- 注脚 -->
-                <div class="card-footer">
-                    <a href=/article/article-detail/{{ article.id }} class="btn btn-primary">阅读本文</a>
+{#                <div class="card-footer">#}
 
 
+                <div>
+                        {% if article.column %}
+                            <button type="button" style="height:30px;width:80px"
+                                class="btn btn-sm mb-2
+                                    {% if article.column.title == 'Android' %}
+                                        btn-success
+                                    {% elif article.column.title == 'JAVA' %}
+                                        btn-danger
+                                    {% elif article.column.title == 'Python' %}
+                                        btn-warning
+                                    {% endif %}
+                                "
+                            >
+                                {{ article.column.title }}
+                            </button>
+                        {% endif %}
+                        {% if article.tags %}
+                            <span>
+
+                            {% for tag in article.tags.all %}
+                                 <a href="#"
+                                   class="badge badge-secondary">
+                                    {{ tag }}
+                                 </a>
+                            {% endfor %}
+
+                            </span>
+
+                        {% endif %}
                 </div>
+                <b>
+                    <p>
+                        <span style="color: red;">
+                            {{ article.total_views }} 浏览&nbsp;&nbsp;&nbsp;
+                        </span>
+                        <span style="color: green;">
+                            {{ article.created | date:'Y-m-d'}} 创建&nbsp;&nbsp;&nbsp;
+                        </span>
+                        <span style="color: yellowgreen;">
+                            {{ article.updated | date:'Y-m-d'}} 更新&nbsp;&nbsp;&nbsp;
+                        </span>
+
+                    </p>
+                </b>
+
+
+{#                    <a href=/article/article-detail/{{ article.id }} class="btn btn-primary">阅读本文</a>#}
+
+
+{#                </div>#}
             </div>
         </div>
         {% endfor %}
