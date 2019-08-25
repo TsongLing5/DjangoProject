@@ -1,3 +1,4 @@
+from PIL import Image
 from django.db import models
 
 # Create your models here.
@@ -38,6 +39,7 @@ class ArticlePost(models.Model):
     # 文章创建时间。参数 default=timezone.now 指定其在创建数据时将默认写入当前的时间
     created = models.DateTimeField(default=timezone.now())
 
+    avatar = models.ImageField(upload_to='article/%Y%m%d/', blank=True)
 
     # 文章更新时间。参数 auto_now=True 指定每次数据更新时自动写入当前时间
     updated = models.DateTimeField(auto_now=True)
@@ -65,4 +67,17 @@ class ArticlePost(models.Model):
     )
     tags=TaggableManager(blank=True)
 
+
+    def save(self,*args,**kwargs):
+        #调用父类的save，继承思想
+        article = super(ArticlePost, self).save(*args, **kwargs)
+
+        if self.avatar and not kwargs.get("update_fields"):
+            image=Image.open(self.avatar)
+            (x, y) = image.size
+            new_x = 400
+            new_y = int(new_x * (y / x))
+            resized_image = image.resize((new_x, new_y), Image.ANTIALIAS)
+            resized_image.save(self.avatar.path)
+        return article
 

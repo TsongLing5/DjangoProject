@@ -54,28 +54,44 @@ def home(request):
 
 def articleList(request):
     search=request.GET.get('search')
-    if request.user.is_authenticated:
-        profile = Profile.objects.get(user=request.user)
-    if search:
-        if request.GET.get('order') == 'total_views':
-            articleList = ArticlePost.objects.filter(Q(title__icontains=search) | Q(body__icontains=search)).order_by('-total_views')
-            order='total_views'
-        else:
-            articleList=ArticlePost.objects.filter(Q(title__icontains=search)|Q(body__icontains=search))
-            order='normal'
-    else:
-        # search=''
-        if request.GET.get('order') == 'total_views':
-            articleList = ArticlePost.objects.all().order_by('-total_views')
-            order='total_views'
-        else:
-            articleList=ArticlePost.objects.all()
-            order='normal'
+    order=request.GET.get('order')
+    column=request.GET.get('column')
+    tag=request.GET.get('tag')
 
-    pagionator=Paginator(articleList,6)
+    articleList = ArticlePost.objects.all()
+    if search:
+        articleList = articleList.filter(Q(title__icontains=search) | Q(body__icontains=search))
+    else:
+        search=''
+        # if request.GET.get('order') == 'total_views':
+        #     articleList = ArticlePost.objects.all().order_by('-total_views')
+        #     order='total_views'
+        # else:
+
+            # order='normal'
+    if order == 'total_views':
+        articleList=articleList.order_by(
+            '-total_views')
+        # order = 'total_views'
+    else:
+        pass
+    #     articleList = ArticlePost.objects.filter(Q(title__icontains=search) | Q(body__icontains=search))
+    #     order = 'normal'
+    if column:
+        articleList=articleList.filter(column=column)
+    else:
+        pass
+    if tag:
+        articleList=articleList.filter(tags__name__in=[tag])
+    else:
+        pass
+
+    pagionator=Paginator(articleList,3)
     page=request.GET.get('page')
     articles=pagionator.get_page(page)
+
     if request.user.is_authenticated:
+        profile = Profile.objects.get(user=request.user)
         context = {'articles': articles,'order':order,'search':search,'profile':profile}
     else:
         context = {'articles': articles, 'order': order, 'search': search}
@@ -121,7 +137,7 @@ def article_detail(request, id):
 def article_create(request):
     if request.method == "POST":
         # 将提交的数据赋值到表单实例中
-        article_post_form = ArticlePostForm(data=request.POST)
+        article_post_form = ArticlePostForm(request.POST,request.FILES)
         # 判断提交的数据是否满足模型的要求
         if article_post_form.is_valid():
             # 保存数据，但暂时不提交到数据库中
@@ -162,18 +178,23 @@ def article_update(request,id):
     article=ArticlePost.objects.get(id=id)
     if request.user == article.author:
         if request.method == "POST":
-            article_post_form = ArticlePostForm(data=request.POST)
+            article_post_form = ArticlePostForm(request.POST,request.FILES)
             if article_post_form.is_valid():
                 article.title=request.POST['title']
                 article.body = request.POST['body']
+
+                if request.FILES:
+                    article.avatar=request.FILES.get('avatar')
+
                 tags=request.POST['tags']
                 if(tags):
-                    print(tags)
-                    print(article.tags.all)
-                    article.tags.clear()
-                    for tag in tags.split(","):
-                        article.tags.add(tag)
-                        print(tag)
+                    # print(tags)
+                    # print(article.tags.all)
+                    # article.tags.clear()
+                    # for tag in tags.split(","):
+                    #     article.tags.add(tag)
+                    #     print(tag)
+                    article.tags.set(*tags.split(","),clear=True)
 
                 # article.tags.set(request.POST['tags'],clear=True)
                 # print(request.POST['title'])
@@ -181,7 +202,8 @@ def article_update(request,id):
                 if(request.POST['column'] != 'none'):
                     article.column=ArticleColumn.objects.get(id=request.POST['column'])
                 else:
-                    article.column=None
+                    pass
+                    # article.column=None
                 article.save()
 
                 return redirect("/article/article-detail/"+str(id))
@@ -190,9 +212,11 @@ def article_update(request,id):
         else:  #metho GET
             article_get_form = ArticlePostForm()
             columns = ArticleColumn.objects.all()
-
+            tags=','.join([x for x in article.tags.names()])
+            print(article.tags.names())
+            print(tags)
             article_get_form.body=article.body
-            context = {'article':article,'article_get_form': article_get_form,'columns':columns}
+            context = {'article':article,'article_get_form': article_get_form,'columns':columns,'tags':tags}
             return render(request, 'article/createpage.html', context)
     else:
         return HttpResponse("无权修改")
