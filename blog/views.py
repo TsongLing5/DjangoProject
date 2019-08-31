@@ -13,6 +13,7 @@ from blog.forms import ArticlePostForm
 from blog.models import ArticleColumn
 import markdown
 
+from comment.forms import CommentForm
 from comment.models import Comment
 from userprofile.models import Profile
 import configparser
@@ -102,8 +103,8 @@ def article_detail(request, id):
     comments=Comment.objects.filter(article=id)
 
     # comments = Comment.objects.filter(article=id)
-
-    profile = Profile.objects.get(user=request.user)
+    if request.user.is_authenticated:
+        profile = Profile.objects.get(user=request.user)
     # print(profile.avatar.url)
     # print(request.user)
 
@@ -126,9 +127,13 @@ def article_detail(request, id):
     #                                      'markdown.extensions.TOC',
     #                                  ])
     article.body = md.convert(article.body)
-
-    context = {'article':article,'toc': md.toc,'comments':comments,'profile':profile}
-
+    # if request.user.is_authenticated:
+    comment_form=CommentForm()
+    if request.user.is_authenticated:
+        context = {'article':article,'toc': md.toc,'comments':comments,'profile':profile,'comment_form':comment_form}
+    else:
+        context = {'article': article, 'toc': md.toc, 'comments': comments,
+                   'comment_form': comment_form}
     # article = ArticlePost.objects.get(id=id)
     # # 需要传递给模板的对象
     # context = {'article': article}
